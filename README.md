@@ -42,7 +42,7 @@ To utilize the Google Maps Geocoding API for geographical data retrieval, follow
 
 ### Database Schema Design
 
-The database schema is designed to handle various entities and their relationships. Refer to the provided [DBDiagram](link-to-your-db-diagram) for an overview of the database structure.
+The database schema is designed to handle various entities and their relationships. Refer to the provided [DBDiagram] for an overview of the database structure.
 
 ## PostGIS Installation and Configuration
 
