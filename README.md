@@ -54,8 +54,9 @@ The database schema is designed to handle various entities and their relationshi
    sudo apt-get update
    sudo apt-get install postgis
 3. Enable PostGIS on your database by running the following command in the PostgreSQL shell:
-```bash
-CREATE EXTENSION postgis;
+
+	```bash
+	CREATE EXTENSION postgis;
 
 4. Verify that PostGIS is installed and functioning correctly:
 ```bash
