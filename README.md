@@ -59,8 +59,8 @@ The database schema is designed to handle various entities and their relationshi
 	CREATE EXTENSION postgis;
 
 4. Verify that PostGIS is installed and functioning correctly:
-```bash
-SELECT PostGIS_Version();
+	```bash
+	SELECT PostGIS_Version();
 
 ## pgAdmin Setup
 
@@ -78,11 +78,13 @@ SELECT PostGIS_Version();
      - Password: [Your password]
    - Click "Save" to connect to your PostgreSQL database.
 ### Running benchmark
-```bash
+	```bash
+	pgbench -i -s 100 <database_name>
+	pgbench -c 10 -j 2 -T 300 <database_name>
 
-###Raw_data
+### Raw_data
 
-High-cardinality tables
+## High-cardinality tables
 
 User table: 
 Explain Analyze Select * From users Where username= 'julie22';
@@ -90,7 +92,7 @@ Execution Time: 10.115 ms
 After indexing username/email 
 Explain Analyze Select * From users Where username = 'julie22'; 
 Execution Time: 0.071 ms
-
+-----
 Openhours: 
 Expain Analyze Select * From open_hours where day_of_week = 2
 	And start_time >= '04:20:00'
@@ -100,10 +102,11 @@ Expain Analyze Select * From open_hours where day_of_week = 2
 	And start_time >= '04:20:00'
 	And end_time <= '20:30:00'
 Execution Time: 0.205 ms
-
-Pgbench
+------
+## Pgbench
 Using indexing tecniques for user benching 
 userbenching.py
+
 transaction type: userbenching
 scaling factor: 1
 query mode: simple
@@ -115,7 +118,7 @@ latency average = 10.5 ms
 latency stddev = 5.2 ms
 tps = 33.33 (including connections establishing)
 tps = 33.45 (excluding connections establishing)
-----
+-----
 transaction type: userbenching
 scaling factor: 1
 query mode: simple
@@ -127,6 +130,5 @@ latency average = 1.5 ms
 latency stddev = 0.8 ms
 tps = 166.67 (including connections establishing)
 tps = 167.00 (excluding connections establishing)
-pgbench -i -s 100 <database_name>
-pgbench -c 10 -j 2 -T 300 <database_name>
+
 
