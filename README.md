@@ -62,7 +62,7 @@ The database schema is designed to handle various entities and their relationshi
 	```bash
 	SELECT PostGIS_Version();
 
-## pgAdmin Setup
+### pgAdmin Setup
 
 1. **Download and Install pgAdmin:**
 
