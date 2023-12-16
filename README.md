@@ -92,7 +92,7 @@ Execution Time: 10.115 ms
 After indexing username/email 
 Explain Analyze Select * From users Where username = 'julie22'; 
 Execution Time: 0.071 ms
------
+
 Openhours: 
 Expain Analyze Select * From open_hours where day_of_week = 2
 	And start_time >= '04:20:00'
@@ -102,10 +102,11 @@ Expain Analyze Select * From open_hours where day_of_week = 2
 	And start_time >= '04:20:00'
 	And end_time <= '20:30:00'
 Execution Time: 0.205 ms
-------
-## Pgbench
+
+##  Pgbench
 Using indexing tecniques for user benching 
-userbenching.py
+
+userbenching.py(progress)
 
 transaction type: userbenching
 scaling factor: 1
@@ -118,7 +119,7 @@ latency average = 10.5 ms
 latency stddev = 5.2 ms
 tps = 33.33 (including connections establishing)
 tps = 33.45 (excluding connections establishing)
------
+
 transaction type: userbenching
 scaling factor: 1
 query mode: simple
