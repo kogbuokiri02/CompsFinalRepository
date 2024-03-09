@@ -1,6 +1,6 @@
 # Database Project - README
 
-This project aims to create a database schema for a dish-review application, emphasizing user-centric design, efficient data organization, and optimized query performance.
+(All the results are in the TXT file) This project aims to create a database schema for a dish-review application, emphasizing user-centric design, efficient data organization, and optimized query performance.
 
 ## Dependencies
 
