@@ -119,9 +119,9 @@ CREATE TABLE User_review (
     created_at TIMESTAMP
 );
 ---
-Sign-in Page
+--Sign-in Page
 
-User Profile Retrieval (GET Request):
+--User Profile Retrieval (GET Request):
 
 
 SELECT username, email, role, created_at
@@ -132,7 +132,7 @@ CREATE INDEX idx_username ON users(username);
 CREATE INDEX idx_username_covering ON users(username) INCLUDE (email, role, created_at);
 
 
-User Authentication (POST Request):
+--User Authentication (POST Request):
 
 SELECT COUNT(*)
 FROM users
@@ -140,16 +140,16 @@ WHERE username = '' AND password = '';
 
 
 ---
-User Role Update (POST Request):
+--User Role Update (POST Request):
 
 UPDATE users
 SET role = 'new_role'
 WHERE username = 'username';
 
 ---
-User Engagement Analysis (Sample Query):
+--User Engagement Analysis (Sample Query):
 
-Analyze user engagement based on sign-up trends and adoption patterns.
+--Analyze user engagement based on sign-up trends and adoption patterns.
 -- Example: Partitioning by range
 CREATE TABLE users_partitioned (
     CHECK (created_at >= '' AND created_at < '')
@@ -162,9 +162,9 @@ CREATE INDEX idx_created_at_partitioned ON users_partitioned(created_at);
 ---------
 --- Example of indexing user_id column
 CREATE INDEX idx_user_reviews_user_id ON user_review(user_id);
-User Profile Page:
+--User Profile Page:
 
-Posting Reviews:
+--Posting Reviews:
 SELECT  
     taste_rating, 
     preparation_time_rating, 
@@ -187,7 +187,7 @@ FROM
 WHERE 
     review_id = 'review_id_here';
 
-Reviews liked by a user:
+--Reviews liked by a user:
 CREATE INDEX idx_likes_user_id ON likes(user_id);
 SELECT 
     ur.id AS review_id,
@@ -209,7 +209,7 @@ WHERE
 
 
 -------------------
-Explore Page:
+--Explore Page:
 
 -- Index on business_2_dish_name table
 CREATE INDEX idx_business_dish_name ON business_2_dish_name(business_2_id, dish_name_id);
@@ -217,7 +217,7 @@ CREATE INDEX idx_business_dish_name ON business_2_dish_name(business_2_id, dish_
 -- Index on user_review table
 CREATE INDEX idx_user_review_business_2_dish_name_id ON user_review(business_2_dish_name_id);
 
-Identify Relevant Dish-Business Pairs: 
+--Identify Relevant Dish-Business Pairs: 
 SELECT
     bdjn.business_id,
     bdjn.dish_id
@@ -236,7 +236,7 @@ LIMIT 10;
 
 
 
-Retrieve Most Liked Review for a Specific Dish-Business Pair:
+--Retrieve Most Liked Review for a Specific Dish-Business Pair:
 
 SELECT 
     user_review.id AS review_id,
@@ -265,9 +265,8 @@ ORDER BY
 LIMIT 1;
 
 
-Most Recent Reviews Section: 
+--Most Recent Reviews Section: 
 
-Explain Analyze
 SELECT 
     user_review.id,
     user_review.overall_review,
@@ -289,9 +288,9 @@ ORDER BY
     user_review.created_at DESC, likes_count DESC
 LIMIT 10;
 ---
-Filtering on Explore Page:
+--Filtering on Explore Page:
 
-Cuisine-Based Filtering
+--Cuisine-Based Filtering
 CREATE INDEX idx_cuisine_cuisine_name ON cuisine (cuisine_name);
 CREATE INDEX idx_business_dish_name_business_id ON business_2_dish_name (business_2_id);
 CREATE INDEX idx_business_dish_name_dish_name_id ON business_2_dish_name (dish_name_id);
@@ -336,10 +335,9 @@ JOIN
 ORDER BY 
     ur.created_at DESC
 LIMIT 10;
-Results:
 
 
-Operating Hours Filtering:
+--Operating Hours Filtering:
 CREATE INDEX idx_business_open_hours_business_id ON business_open_hours (business_id);
 CREATE INDEX idx_day_day_name ON day (day_name);
 CREATE INDEX idx_business_open_hours_business_day ON business_open_hours (business_id, day_id);
@@ -389,7 +387,7 @@ LIMIT 10;
 
 
 
-Tag-based Filtering
+--Tag-based Filtering
 SELECT 
     user_reviews.review_id,
     user_reviews.overall_rating,
@@ -408,12 +406,12 @@ WHERE
     tags.tag_name = 'desired_tag';
 
 
-Proximity-based Searching (both map and filtering):
+--Proximity-based Searching (both map and filtering):
 
 CREATE INDEX idx_business_location ON business_2 USING GIST(location);
 CREATE INDEX idx_users_location ON users_locations USING GIST(geographical_point);
 
--Get businesses on the map close to user:
+--Get businesses on the map close to user:
 SELECT 
     business_2.id,
     business_2.business_name,
@@ -427,7 +425,7 @@ JOIN
 
 
 
--Get Reviews based on user proximity:
+--Get Reviews based on user proximity:
 -- Step 1: Get business_id based on proximity
 WITH nearby_businesses AS (
     SELECT 
@@ -488,7 +486,7 @@ ORDER BY
 LIMIT 10;
 
 
-Rating-Based Filtering: 
+--Rating-Based Filtering: 
 
 SELECT 
     user_review.id,
@@ -525,9 +523,9 @@ JOIN
 WHERE 
     user_reviews.id = 'desired_review_id';
 ---
-Business Page: 
+--Business Page: 
 
-Most Like User Review for Menu Item:
+--Most Like User Review for Menu Item:
 SELECT 
     ur.user_id,
     ur.overall_review,
@@ -555,7 +553,7 @@ LIMIT
     6;
 
 
-External Review:
+--External Review:
 SELECT 
     external_reviews.external_review_id,
     external_reviews.overall_rating,
