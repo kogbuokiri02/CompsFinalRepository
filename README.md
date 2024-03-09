@@ -77,4 +77,112 @@ The database schema is designed to handle various entities and their relationshi
      - Username: [Your username]
      - Password: [Your password]
    - Click "Save" to connect to your PostgreSQL database.
+## ER DIAGRAM
+Table users {
+  id int [pk]
+  email varchar
+  username varchar
+  password varchar
+  role varchar
+  created_at datetime
+  users_locations_id int [ref: > users_locations.id] 
+}
+
+Table dishes {
+  id int [pk]
+  name varchar
+}
+
+Table external_review {
+  id int [pk]
+  review int
+  review_url varchar
+  business_id int [ref: > Business.id]
+}
+
+Table users_partitioned {
+  id int [pk]
+  //inherits users based on time slot
+}
+
+Table cuisine {
+  id int [pk]
+  cuisine_name varchar
+}
+
+Table user_review_tags {
+  id int [pk]
+  user_review_id int [ref: > User_review.id]
+  tags_id int [ref: > tags.id]
+}
+
+Table Business {
+  id int [pk]
+  business_name varchar
+  address varchar
+  city varchar
+  state varchar
+  country varchar
+  location point
+}
+
+Table Business_dishes {
+  id int [pk]
+  dishes_id int [ref: >dishes.id]
+  business_id int [ref: > Business.id]
+}
+
+Table users_locations {
+  id int [pk]
+  address varchar
+  city varchar
+  state varchar
+  country varchar
+  geospatial_point point
+}
+
+Table open_hours {
+  id int [pk]
+  day_of_week varchar
+  start_time datetime
+  end_time datetime
+}
+
+Table likes {
+  id int [pk]
+  user_id int [ref: > users.id]
+  user_review_id int [ref: >User_review.id]
+  created_at datetime
+}
+
+Table tags {
+  id int [pk]
+  tag_name varchar
+}
+
+Table Business_open_hours {
+  id int [pk]
+  business_id int [ref: > Business.id]
+  open_hours_id int [ref: > open_hours.id]
+}
+
+Table Business_cuisine {
+  business_id int [ref: > Business.id]
+  cuisine_id int [ref: > cuisine.id]
+}
+
+Table User_review {
+  id int [pk]
+  users_id int [ref: > users.id]
+  business_dish_id int [ref: > Business_dishes.id]
+  overall_review int
+  taste_rating int
+  preparation_time_rating int
+  friendliness_to_restrictions int
+  portion_rating int
+  price_rating int
+  dish_reviews varchar
+  created_at timestamp
+}
+
 
