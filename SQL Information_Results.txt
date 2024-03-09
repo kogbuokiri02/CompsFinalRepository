@@ -1,0 +1,721 @@
+SQL Information Results 
+
+Sign-in Page
+
+User Profile Retrieval (GET Request):
+
+EXPLAIN ANALYZE
+SELECT username, email, role, created_at
+FROM users
+WHERE username = 'jay01';
+
+Results
+"Seq Scan on users  (cost=0.00..512.46 rows=1 width=45) (actual time=0.123..4.588 rows=1 loops=1)"
+"  Filter: ((username)::text = 'jay01'::text)"
+"  Rows Removed by Filter: 10276"
+"Planning Time: 0.715 ms"
+"Execution Time: 4.653 ms"
+
+An index on username because it is frequently used.
+ 
+CREATE INDEX idx_username ON users(username);
+CREATE INDEX idx_username_covering ON users(username) INCLUDE (email, role, created_at);
+
+
+EXPLAIN ANALYZE
+SELECT username, email, role, created_at
+FROM users
+WHERE username = 'patty69';
+
+Results: 
+"Index Only Scan using idx_username_covering on users  (cost=0.29..8.30 rows=1 width=45) (actual time=0.087..0.089 rows=1 loops=1)"
+"  Index Cond: (username = 'patty69'::text)"
+"  Heap Fetches: 1"
+"Planning Time: 0.311 ms"
+"Execution Time: 0.133 ms"
+
+-----
+User Authentication (POST Request):
+
+DROP INDEX idx_username;
+Drop Index idx_username_covering;
+
+Explain Analyze
+SELECT COUNT(*)
+FROM users
+WHERE username = 'felicia79' AND password = '%J0RE4kDK(';
+
+Results
+"Aggregate  (cost=538.16..538.17 rows=1 width=8) (actual time=2.925..2.927 rows=1 loops=1)"
+"  ->  Seq Scan on users  (cost=0.00..538.15 rows=1 width=0) (actual time=0.091..2.913 rows=1 loops=1)"
+"        Filter: (((username)::text = 'felicia79'::text) AND ((password)::text = '%J0RE4kDK('::text))"
+"        Rows Removed by Filter: 10276"
+"Planning Time: 0.816 ms"
+"Execution Time: 3.000 ms"
+
+CREATE INDEX idx_username ON users(username);
+CREATE INDEX idx_username_covering ON users(username) INCLUDE (email, role, created_at);
+
+Explain Analyze
+SELECT COUNT(*)
+FROM users
+WHERE username = 'felicia79' AND password = '%J0RE4kDK(';
+
+
+
+Explain Analyze
+SELECT COUNT(*)
+FROM users
+WHERE username = 'felicia79' AND password = '%J0RE4kDK(';
+
+Results:
+"Aggregate  (cost=8.31..8.32 rows=1 width=8) (actual time=0.080..0.081 rows=1 loops=1)"
+"  ->  Index Scan using idx_username_covering on users  (cost=0.29..8.30 rows=1 width=0) (actual time=0.071..0.073 rows=1 loops=1)"
+"        Index Cond: ((username)::text = 'felicia79'::text)"
+"        Filter: ((password)::text = '%J0RE4kDK('::text)"
+"Planning Time: 0.338 ms"
+"Execution Time: 0.149 ms"
+---
+User Authentication (POST Request):
+DROP INDEX idx_username;
+Drop Index idx_username_covering;
+
+Explain Analyze
+SELECT COUNT(*)
+FROM users
+WHERE username = 'felicia79' AND password = '%J0RE4kDK(';
+
+Results: 
+"Aggregate  (cost=538.16..538.17 rows=1 width=8) (actual time=2.467..2.468 rows=1 loops=1)"
+"  ->  Seq Scan on users  (cost=0.00..538.15 rows=1 width=0) (actual time=0.096..2.458 rows=1 loops=1)"
+"        Filter: (((username)::text = 'felicia79'::text) AND ((password)::text = '%J0RE4kDK('::text))"
+"        Rows Removed by Filter: 10276"
+"Planning Time: 0.239 ms"
+"Execution Time: 2.520 ms"
+
+CREATE INDEX idx_username ON users(username);
+CREATE INDEX idx_username_covering ON users(username) INCLUDE (email, role, created_at);
+
+Explain Analyze
+SELECT COUNT(*)
+FROM users
+WHERE username = 'felicia79' AND password = '%J0RE4kDK(';
+
+Results:
+"Aggregate  (cost=8.31..8.32 rows=1 width=8) (actual time=0.095..0.096 rows=1 loops=1)"
+"  ->  Index Scan using idx_username_covering on users  (cost=0.29..8.30 rows=1 width=0) (actual time=0.073..0.076 rows=1 loops=1)"
+"        Index Cond: ((username)::text = 'felicia79'::text)"
+"        Filter: ((password)::text = '%J0RE4kDK('::text)"
+"Planning Time: 0.380 ms"
+"Execution Time: 0.151 ms"
+---
+User Role Update (POST Request):
+
+UPDATE users
+SET role = 'new_role'
+WHERE username = 'username';
+
+Results: 
+"Update on users  (cost=0.29..8.30 rows=0 width=0) (actual time=0.072..0.072 rows=0 loops=1)"
+"  ->  Index Scan using idx_username_covering on users  (cost=0.29..8.30 rows=1 width=1038) (actual time=0.038..0.040 rows=1 loops=1)"
+"        Index Cond: ((username)::text = 'rquinn'::text)"
+"Planning Time: 0.186 ms"
+"Execution Time: 0.104 ms"
+---
+User Engagement Analysis (Sample Query):
+Analyze user engagement based on sign-up trends and adoption patterns.
+
+EXPLAIN ANALYZE
+SELECT EXTRACT(MONTH FROM created_at) AS registration_month, COUNT(*) AS user_count
+FROM users
+GROUP BY registration_month;
+
+"HashAggregate  (cost=563.85..574.40 rows=844 width=40) (actual time=20.519..20.528 rows=2 loops=1)"
+"  Group Key: EXTRACT(month FROM created_at)"
+"  Batches: 1  Memory Usage: 49kB"
+"  ->  Seq Scan on users  (cost=0.00..512.46 rows=10277 width=32) (actual time=1.229..12.332 rows=10277 loops=1)"
+"Planning Time: 5.313 ms"
+"Execution Time: 21.727 ms"
+
+-- Example: Partitioning by range
+CREATE TABLE users_partitioned (
+    CHECK (created_at >= '' AND created_at < '')
+) INHERITS (users);
+
+-- Create indexes on the partitioned table as needed
+CREATE INDEX idx_created_at_partitioned ON users_partitioned(created_at);
+
+"HashAggregate  (cost=10.70..11.20 rows=40 width=40) (actual time=0.071..0.072 rows=0 loops=1)"
+"  Group Key: EXTRACT(month FROM created_at)"
+"  Batches: 1  Memory Usage: 24kB"
+"  ->  Seq Scan on users_partitioned  (cost=0.00..10.50 rows=40 width=32) (actual time=0.067..0.067 rows=0 loops=1)"
+"Planning Time: 3.710 ms"
+"Execution Time: 0.796 ms"
+
+
+---------
+User Profile Page:
+
+Posting Reviews:
+Explain Analyze
+SELECT  
+    taste_rating, 
+    preparation_time_rating, 
+    portion_rating, 
+    price, 
+    dish_reviews
+FROM 
+    user_review
+WHERE 
+    user_id = 'user_id_her';
+
+Results: 
+"Seq Scan on user_review  (cost=0.00..73.75 rows=1 width=126) (actual time=0.018..0.316 rows=1 loops=1)"
+"  Filter: (user_id = 267055)"
+"  Rows Removed by Filter: 3099"
+"Planning Time: 0.308 ms"
+"Execution Time: 0.336 ms"
+
+--- Example of indexing user_id column
+CREATE INDEX idx_user_reviews_user_id ON user_review(user_id);
+
+Explain Analyze
+SELECT 
+    review_id, 
+    overall_rating, 
+    taste_rating, 
+    preparation_time_rating, 
+    friendliness_rating, 
+    portion_rating, 
+    price, 
+    dish_reviews, 
+    created_at
+FROM 
+    user_reviews
+WHERE 
+    user_id = 'user_id_here';
+
+Results: 
+"Index Scan using idx_user_reviews_user_id on user_review  (cost=0.28..8.30 rows=1 width=126) (actual time=0.019..0.020 rows=1 loops=1)"
+"  Index Cond: (user_id = 267055)"
+"Planning Time: 0.124 ms"
+"Execution Time: 0.041 ms"
+--
+Like Count on Review: 
+
+Explain Analyze
+SELECT 
+    COUNT(*) AS like_count
+FROM 
+    likes
+WHERE 
+    review_id = 'review_id_here';
+
+"Aggregate  (cost=13.75..13.76 rows=1 width=8) (actual time=1.591..1.592 rows=1 loops=1)"
+"  ->  Seq Scan on likes  (cost=0.00..13.75 rows=1 width=0) (actual time=0.532..1.569 rows=1 loops=1)"
+"        Filter: (user_review_id = 100)"
+"        Rows Removed by Filter: 699"
+"Planning Time: 1.183 ms"
+"Execution Time: 1.661 ms"
+
+CREATE INDEX idx_likes_user_review_id ON likes(user_review_id);
+
+
+Explain Analyze
+SELECT 
+    COUNT(*) AS like_count
+FROM 
+    likes
+WHERE 
+    user_review_id = '';
+
+"Aggregate  (cost=8.29..8.30 rows=1 width=8) (actual time=0.322..0.323 rows=1 loops=1)"
+"  ->  Index Only Scan using idx_likes_user_review_id on likes  (cost=0.28..8.29 rows=1 width=0) (actual time=0.310..0.312 rows=1 loops=1)"
+"        Index Cond: (user_review_id = 100)"
+"        Heap Fetches: 1"
+"Planning Time: 0.772 ms"
+"Execution Time: 0.398 ms"
+--
+Reviews liked by a user:
+
+SELECT 
+    ur.id AS review_id,
+    ur.overall_rating,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    likes l ON ur.id = l.user_review_id
+WHERE 
+    l.user_id = 'user_id_here';
+
+Results: 
+"Nested Loop  (cost=0.28..30.35 rows=2 width=138) (actual time=0.049..0.412 rows=2 loops=1)"
+"  ->  Seq Scan on likes l  (cost=0.00..13.75 rows=2 width=4) (actual time=0.030..0.072 rows=2 loops=1)"
+"        Filter: (user_id = 622061)"
+"        Rows Removed by Filter: 698"
+"  ->  Index Scan using user_review_pkey on user_review ur  (cost=0.28..8.30 rows=1 width=138) (actual time=0.167..0.167 rows=1 loops=2)"
+"        Index Cond: (id = l.user_review_id)"
+"Planning Time: 9.617 ms"
+"Execution Time: 0.818 ms"
+
+-- CREATE INDEX idx_likes_user_id ON likes(user_id);
+Explain Analyze
+SELECT 
+    ur.id AS review_id,
+    ur.overall_rating,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    likes l ON ur.id = l.user_review_id
+WHERE 
+    l.user_id = 'user_id_here';
+
+Results:
+"Nested Loop  (cost=4.57..25.12 rows=2 width=138) (actual time=0.084..0.093 rows=2 loops=1)"
+"  ->  Bitmap Heap Scan on likes l  (cost=4.29..8.52 rows=2 width=4) (actual time=0.070..0.072 rows=2 loops=1)"
+"        Recheck Cond: (user_id = 622061)"
+"        Heap Blocks: exact=2"
+"        ->  Bitmap Index Scan on idx_likes_user_id  (cost=0.00..4.29 rows=2 width=0) (actual time=0.064..0.064 rows=2 loops=1)"
+"              Index Cond: (user_id = 622061)"
+"  ->  Index Scan using user_review_pkey on user_review ur  (cost=0.28..8.30 rows=1 width=138) (actual time=0.008..0.008 rows=1 loops=2)"
+"        Index Cond: (id = l.user_review_id)"
+"Planning Time: 1.057 ms"
+"Execution Time: 0.171 ms"
+-------------------
+Explore Page:
+
+Identify Relevant Dish-Business Pairs: 
+SELECT
+    bdjn.business_id,
+    bdjn.dish_id
+FROM
+    user_review ur
+JOIN
+    business_2_dish_name bdjn ON ur.business_2_dish_name_id = bdjn.id
+JOIN
+    likes l ON ur.id = l.user_review_id
+GROUP BY
+    bdjn.business_id, bdjn.dish_id
+ORDER BY
+    AVG(ur.overall_rating) DESC, COUNT(l.id) DESC
+LIMIT 10;
+
+Results: 
+
+"Limit  (cost=115.25..115.27 rows=10 width=48) (actual time=2.339..2.344 rows=10 loops=1)"
+"  ->  Sort  (cost=115.25..115.70 rows=182 width=48) (actual time=2.337..2.341 rows=10 loops=1)"
+"        Sort Key: (avg(ur.overall_review)) DESC, (count(l.id)) DESC"
+"        Sort Method: top-N heapsort  Memory: 26kB"
+"        ->  HashAggregate  (cost=109.04..111.31 rows=182 width=48) (actual time=2.178..2.261 rows=100 loops=1)"
+"              Group Key: bdjn.business_2_id, bdjn.dish_name_id"
+"              Batches: 1  Memory Usage: 48kB"
+"              ->  Hash Join  (cost=7.05..102.04 rows=700 width=16) (actual time=0.192..1.263 rows=700 loops=1)"
+"                    Hash Cond: (ur.business_2_dish_name_id = bdjn.id)"
+"                    ->  Merge Join  (cost=0.56..93.69 rows=700 width=12) (actual time=0.045..0.883 rows=700 loops=1)"
+"                          Merge Cond: (ur.id = l.user_review_id)"
+"                          ->  Index Scan using user_review_pkey on user_review ur  (cost=0.28..213.44 rows=3100 width=12) (actual time=0.028..0.366 rows=701 loops=1)"
+"                          ->  Index Scan using idx_likes_user_review_id on likes l  (cost=0.28..34.77 rows=700 width=8) (actual time=0.015..0.196 rows=700 loops=1)"
+"                    ->  Hash  (cost=4.00..4.00 rows=200 width=12) (actual time=0.102..0.102 rows=200 loops=1)"
+"                          Buckets: 1024  Batches: 1  Memory Usage: 17kB"
+"                          ->  Seq Scan on business_2_dish_name bdjn  (cost=0.00..4.00 rows=200 width=12) (actual time=0.041..0.065 rows=200 loops=1)"
+"Planning Time: 1.813 ms"
+
+-- Index on business_2_dish_name table
+CREATE INDEX idx_business_dish_name ON business_2_dish_name(business_2_id, dish_name_id);
+
+-- Index on user_review table
+CREATE INDEX idx_user_review_business_2_dish_name_id ON user_review(business_2_dish_name_id);
+
+
+Results: 
+"        Sort Key: (avg(ur.overall_review)) DESC, (count(l.id)) DESC"
+"        Sort Method: top-N heapsort  Memory: 26kB"
+"        ->  HashAggregate  (cost=109.04..111.31 rows=182 width=48) (actual time=0.712..0.747 rows=100 loops=1)"
+"              Group Key: bdjn.business_2_id, bdjn.dish_name_id"
+"              Batches: 1  Memory Usage: 48kB"
+"              ->  Hash Join  (cost=7.05..102.04 rows=700 width=16) (actual time=0.063..0.572 rows=700 loops=1)"
+"                    Hash Cond: (ur.business_2_dish_name_id = bdjn.id)"
+"                    ->  Merge Join  (cost=0.56..93.69 rows=700 width=12) (actual time=0.011..0.408 rows=700 loops=1)"
+"                          Merge Cond: (ur.id = l.user_review_id)"
+"                          ->  Index Scan using user_review_pkey on user_review ur  (cost=0.28..213.44 rows=3100 width=12) (actual time=0.005..0.162 rows=701 loops=1)"
+"                          ->  Index Scan using idx_likes_user_review_id on likes l  (cost=0.28..34.77 rows=700 width=8) (actual time=0.004..0.089 rows=700 loops=1)"
+"                    ->  Hash  (cost=4.00..4.00 rows=200 width=12) (actual time=0.048..0.048 rows=200 loops=1)"
+"                          Buckets: 1024  Batches: 1  Memory Usage: 17kB"
+"                          ->  Seq Scan on business_2_dish_name bdjn  (cost=0.00..4.00 rows=200 width=12) (actual time=0.016..0.031 rows=200 loops=1)"
+"Planning Time: 0.386 ms"
+"Execution Time: 0.820 ms"
+---
+Retrieve Most Liked Review for a Specific Dish-Business Pair:
+(no need to analyze due to the existing indexes)
+SELECT 
+    user_review.id AS review_id,
+    user_review.overall_review AS overall_rating,
+    user_review.taste_rating,
+    user_review.preparation_time_rating,
+    user_review.friendliness_to_restrictions AS friendliness_rating,
+    user_review.portion_rating,
+    user_review.price AS price_rating,
+    user_review.dish_reviews,
+    user_review.created_at,
+    COUNT(likes.id) AS likes_count
+FROM 
+    user_review
+JOIN 
+    business_2_dish_name ON user_review.business_2_dish_name_id = business_2_dish_name.id
+LEFT JOIN 
+    likes ON user_review.id = likes.user_review_id
+WHERE 
+    business_2_dish_name.business_2_id = '230'
+    AND business_2_dish_name.dish_name_id = '27'
+GROUP BY 
+    user_review.id
+ORDER BY 
+    user_review.created_at DESC, likes_count DESC
+LIMIT 1;
+
+Results:
+"Execution Time: 0.363 ms"
+---
+Most Recent Reviews Section 
+
+Explain Analyze
+SELECT 
+    user_review.id,
+    user_review.overall_review,
+    user_review.taste_rating,
+    user_review.preparation_time_rating,
+    user_review.friendliness_to_restrictions,
+    user_review.portion_rating,
+    user_review.price,
+    user_review.dish_reviews,
+    user_review.created_at,
+    COUNT(likes.id) AS likes_count
+FROM 
+    user_review
+LEFT JOIN 
+    likes ON user_review.id = likes.user_review_id
+GROUP BY 
+    user_review.id
+ORDER BY 
+    user_review.created_at DESC, likes_count DESC
+LIMIT 10;
+Results:
+"Limit  (cost=260.86..260.89 rows=10 width=158) (actual time=6.318..6.323 rows=10 loops=1)"
+"  ->  Sort  (cost=260.86..268.61 rows=3100 width=158) (actual time=6.316..6.320 rows=10 loops=1)"
+"        Sort Key: user_review.created_at DESC, (count(likes.id)) DESC"
+"        Sort Method: top-N heapsort  Memory: 27kB"
+"        ->  HashAggregate  (cost=162.88..193.88 rows=3100 width=158) (actual time=3.882..5.150 rows=3100 loops=1)"
+"              Group Key: user_review.id"
+"              Batches: 1  Memory Usage: 625kB"
+"              ->  Hash Left Join  (cost=20.75..147.38 rows=3100 width=154) (actual time=0.208..1.976 rows=3100 loops=1)"
+"                    Hash Cond: (user_review.id = likes.user_review_id)"
+"                    ->  Seq Scan on user_review  (cost=0.00..108.00 rows=3100 width=150) (actual time=0.036..0.953 rows=3100 loops=1)"
+"                    ->  Hash  (cost=12.00..12.00 rows=700 width=8) (actual time=0.159..0.160 rows=700 loops=1)"
+"                          Buckets: 1024  Batches: 1  Memory Usage: 36kB"
+"                          ->  Seq Scan on likes  (cost=0.00..12.00 rows=700 width=8) (actual time=0.011..0.082 rows=700 loops=1)"
+"Planning Time: 0.322 ms"
+"Execution Time: 6.619 ms"
+
+CREATE INDEX idx_created_at ON user_review(created_at);
+
+Results: (database is under more stress)
+"Execution Time: 5.971 ms"
+-----
+Cuisine-Based Filtering
+CREATE INDEX idx_cuisine_cuisine_name ON cuisine (cuisine_name);
+CREATE INDEX idx_business_dish_name_business_id ON business_2_dish_name (business_2_id);
+CREATE INDEX idx_business_dish_name_dish_name_id ON business_2_dish_name (dish_name_id);
+-- Step 1: Get business_id based on desired cuisine
+WITH desired_businesses AS (
+    SELECT 
+        business_2.id
+    FROM 
+        business_2
+    JOIN 
+        business_cuisine ON business_2.id = business_cuisine.business_id
+    JOIN 
+        cuisine ON business_cuisine.cuisine_id = cuisine.id
+    WHERE 
+        cuisine.cuisine_name = 'Italian'
+)
+-- Step 2: Get dishes associated with the business from the junction table
+, business_dishes AS (
+    SELECT 
+        bdjn.business_2_id,
+        bdjn.dish_name_id
+    FROM 
+        business_2_dish_name bdjn
+    JOIN 
+        desired_businesses ON bdjn.business_2_id = desired_businesses.id
+)
+-- Step 3: Get reviews from the user_review table based on dishes
+SELECT 
+    ur.id AS review_id,
+    ur.overall_review,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    business_dishes ON ur.business_2_dish_name_id = business_dishes.dish_name_id
+ORDER BY 
+    ur.created_at DESC
+LIMIT 10;
+Results:
+"Execution Time: 0.914 ms"
+---
+CREATE INDEX idx_business_open_hours_business_id ON business_open_hours (business_id);
+CREATE INDEX idx_day_day_name ON day (day_name);
+CREATE INDEX idx_business_open_hours_business_day ON business_open_hours (business_id, day_id);
+
+Operating Hours Filtering
+-- Step 1: Get business_id based on desired operating hours
+WITH desired_businesses AS (
+    SELECT 
+        b2.id
+    FROM 
+        business_2 b2
+    JOIN 
+        business_open_hours boh ON b2.id = boh.business_id
+    JOIN 
+        day d ON boh.day_id = d.id
+    WHERE 
+        d.day_name = 'Monday'  -- Adjust based on the desired day
+        AND boh.opening_time <= '08:00:00'  -- Adjust based on the desired opening time
+        AND boh.closing_time >= '12:00:00'  -- Adjust based on the desired closing time
+)
+-- Step 2: Get dishes associated with the business from the junction table
+, business_dishes AS (
+    SELECT 
+        bdjn.business_id,
+        bdjn.dish_name_id
+    FROM 
+        business_2_dish_name bdjn
+    JOIN 
+        desired_businesses ON bdjn.business_id = desired_businesses.id
+)
+-- Step 3: Get reviews from the user_review table based on dishes
+SELECT 
+    ur.id AS review_id,
+    ur.overall_review,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    business_dishes ON ur.business_2_dish_name_id = business_dishes.dish_name_id
+ORDER BY 
+    ur.created_at DESC
+LIMIT 10;
+
+Results:
+"Execution Time: 0.623 ms"
+---
+Tag-based Filtering
+SELECT 
+    user_reviews.review_id,
+    user_reviews.overall_rating,
+    user_reviews.taste_rating,
+    user_reviews.preparation_time_rating,
+    user_reviews.friendliness_rating,
+    user_reviews.portion_rating,
+    user_reviews.price_rating,
+    user_reviews.dish_reviews,
+    user_reviews.created_at
+FROM 
+    user_reviews
+JOIN 
+    tags ON user_reviews.tag_id = tags.tag_id
+WHERE 
+    tags.tag_name = 'desired_tag';
+
+Results: 
+"Execution Time: 0.212 ms"
+----
+Proximity-based Searching (both map and filtering):
+Get businesses on the map close to user:
+SELECT 
+    business_2.id,
+    business_2.business_name,
+    business_2.address,
+    ST_Distance(business_2.location, users_locations.geographical_point) AS distance
+FROM 
+    business_2
+JOIN
+    users_locations ON ST_DWithin(business_2.location, users_locations.geographical_point, 500);
+
+Results:
+"Execution Time: 3310.530 ms"
+
+CREATE INDEX idx_business_location ON business_2 USING GIST(location);
+CREATE INDEX idx_users_location ON users_locations USING GIST(geographical_point);
+
+Results:
+"Execution Time: 35.005 ms"
+--
+Get Reviews based on user proximity:
+-- Step 1: Get business_id based on proximity
+WITH nearby_businesses AS (
+    SELECT 
+        business_2.id
+    FROM 
+        business_2
+    JOIN
+        users_locations ON ST_DWithin(business_2.location, users_locations.geographical_point, 500)
+)
+-- Step 2: Get reviews from the user_review table based on proximity
+SELECT 
+    ur.id AS review_id,
+    ur.overall_review,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    business_2 ON ur.business_2_dish_name_id = business_2.id
+JOIN 
+    nearby_businesses ON ur.business_2_dish_name_id = nearby_businesses.id
+ORDER BY 
+    ur.created_at DESC
+LIMIT 10;
+-- Step 1: Get business_id based on proximity
+WITH nearby_businesses AS (
+    SELECT 
+        business_2.id
+    FROM 
+        business_2
+    JOIN
+        users_locations ON ST_DWithin(business_2.location, users_locations.geographical_point, 500)
+)
+-- Step 2: Get reviews from the user_review table based on proximity
+SELECT 
+    ur.id AS review_id,
+    ur.overall_review,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at
+FROM 
+    user_review ur
+JOIN 
+    business_2 ON ur.business_2_dish_name_id = business_2.id
+JOIN 
+    nearby_businesses ON ur.business_2_dish_name_id = nearby_businesses.id
+ORDER BY 
+    ur.created_at DESC
+LIMIT 10;
+
+Results
+"Execution Time: 2.172 ms"
+---
+Rating Based Filtering: 
+
+SELECT 
+    user_review.id,
+    user_review.overall_review,
+    user_review.taste_rating,
+    user_review.preparation_time_rating,
+    user_review.friendliness_to_restrictions,
+    user_review.portion_rating,
+    user_review.price,
+    user_review.dish_reviews,
+    user_review.created_at
+FROM 
+    user_reviews
+WHERE 
+    user_reviews.overall_rating >= 'desired_minimum_rating';
+(indexing has already occured)
+---
+User Review Card
+SELECT 
+    user_review.id,
+    user_review.overall_rating,
+    user_review.taste_rating,
+    user_review.preparation_time_rating,
+    user_review.friendliness_to_restrictions,
+    user_review.portion_rating,
+    user_review.price,
+    user_review.dish_reviews,
+    user_review.created_at,
+    users.username
+FROM 
+    user_reviews
+JOIN 
+    users ON user_reviews.user_id = users.id
+WHERE 
+    user_reviews.id = 'desired_review_id';
+---
+Business Page: 
+
+Most Like User Review for Menu Item:
+Explain Analyze
+SELECT 
+    ur.user_id,
+    ur.overall_review,
+    ur.taste_rating,
+    ur.preparation_time_rating,
+    ur.friendliness_to_restrictions,
+    ur.portion_rating,
+    ur.price,
+    ur.dish_reviews,
+    ur.created_at,
+    u.username
+FROM 
+    user_review ur
+JOIN 
+    business_2_dish_name bdjn ON ur.business_2_dish_name_id = bdjn.id
+JOIN 
+    users u ON ur.user_id = u.id
+LEFT JOIN
+    likes l ON ur.id = l.user_review_id
+WHERE 
+    bdjn.business_2_id = 'desired_business_id'
+ORDER BY 
+    COUNT(l.id) DESC
+LIMIT 
+    6;
+
+
+External Review:
+SELECT 
+    external_reviews.external_review_id,
+    external_reviews.overall_rating,
+    external_reviews.review_link
+FROM 
+    external_reviews
+WHERE 
+    external_reviews.business_id = 'desired_business_id';
+
+
