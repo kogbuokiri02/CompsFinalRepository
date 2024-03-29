@@ -1,3 +1,48 @@
+
+| SQL Operation Context | Execution Time Before Indexing (ms) | Execution Time After Indexing (ms) |
+|-----------------------|-------------------------------------|------------------------------------|
+| User Profile Retrieval (GET) | 4.653 | 0.133 |
+| User Authentication (POST) | 3.000 | 0.149 |
+| User Role Update (POST) | N/A | 0.104 |
+| User Engagement Analysis | 21.727 | 0.796 (With Partitioning) |
+| Posting Reviews | 0.336 | 0.041 |
+| Like Count on Review | 1.661 | 0.398 |
+| Reviews Liked by a User | 0.818 | 0.171 |
+| Identify Relevant Dish-Business Pairs | 3.120 | 0.820 (Post-Indexing Optimizations) |
+| Retrieve Most Liked Review for a Specific Dish-Business Pair | N/A | 0.363 |
+| Most Recent Reviews Section | 6.619 | 5.971 (With Created_at Index) |
+| Cuisine-Based Filtering | N/A | 0.914 (Post-Indexing Optimizations) |
+| Operating Hours Filtering | N/A | 0.623 (Post-Indexing Optimizations) |
+| Tag-based Filtering | N/A | 0.212 |
+| Proximity-based Searching | 3310.530 | 35.005 |
+| Get Reviews Based on User Proximity | N/A | 2.172 |
+| Rating Based Filtering | N/A | Performance improvement noted, specific time not provided |
+| User Review Card | N/A | Performance improvement noted, specific time not provided |
+| Most Liked User Review for Menu Item | N/A | Performance improvement noted, specific time not provided |
+| External Review | N/A | Performance improvement noted, specific time not provided |
+
+Sizes of tables 
+"table_name"	"size"
+"spatial_ref_sys"	"6896 kB"
+"users"	"3024 kB"
+"user_review"	"616 kB"
+"open_hours"	"296 kB"
+"business_open_hours"	"208 kB"
+"business_2"	"120 kB"
+"users_locations"	"104 kB"
+"external_review"	"80 kB"
+"business_cuisine"	"72 kB"
+"likes"	"40 kB"
+"business_2_dish_name"	"16 kB"
+"dish_name"	"16 kB"
+"cuisine"	"8192 bytes"
+"temp_index_stats"	"8192 bytes"
+"tag"	"8192 bytes"
+"users_partitioned"	"8192 bytes"
+"user_review_tags"	"8192 bytes"
+
+
+
 SQL Information Results 
 
 Sign-in Page
